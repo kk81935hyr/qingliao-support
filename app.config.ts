@@ -33,7 +33,7 @@ const env = {
   // S3 URL of the app logo - set this to the URL returned by generate_image when creating custom logo
   // Leave empty to use the default icon from assets/images/icon.png
   logoUrl: "/manus-storage/qingliao-icon_08c884a5.png",
-  scheme: schemeFromBundleId,
+  scheme: "qingliao",
   iosBundleId: bundleId,
   androidPackage: bundleId,
 };
@@ -86,6 +86,13 @@ const config: ExpoConfig = {
   },
   plugins: [
     "expo-router",
+    [
+      "expo-notifications",
+      {
+        color: "#7159E8",
+        defaultChannel: "support-messages",
+      },
+    ],
     [
       "expo-audio",
       {
