@@ -916,6 +916,51 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+  app.all("/api/support", async (req, res) => {
+    try {
+      const input = req.method === "GET" ? req.query : req.body;
+      const action = String(input.action ?? "");
+      const toConversation = (item) => item ? { id: item.id, visitorToken: item.visitorToken, visitorLabel: item.visitorLabel, status: item.status, createdAt: item.createdAt, lastMessageAt: item.lastMessageAt } : null;
+      const toMessage = (item) => ({ id: item.id, conversationId: item.conversationId, sender: item.sender, body: item.body, imageUrl: item.imageUrl, createdAt: item.createdAt });
+      if (action === "start" && req.method === "POST") {
+        const token = crypto.randomUUID().replace(/-/g, "");
+        const item = await createSupportConversation(token, `\u8BBF\u5BA2 ${token.slice(-4).toUpperCase()}`);
+        return res.json({ conversation: toConversation(item) });
+      }
+      if (action === "inbox" && req.method === "GET") {
+        const items = await listSupportConversations();
+        return res.json({ conversations: items.map(toConversation) });
+      }
+      if (action === "messages" && req.method === "GET") {
+        const item = await getSupportConversationByToken(String(input.visitorToken ?? ""));
+        if (!item) return res.json({ conversation: null, messages: [] });
+        const items = await listSupportMessages(item.id);
+        return res.json({ conversation: toConversation(item), messages: items.map(toMessage) });
+      }
+      if (action === "send" && req.method === "POST") {
+        const token = String(input.visitorToken ?? "");
+        const sender = input.sender === "agent" ? "agent" : "visitor";
+        const body = typeof input.body === "string" ? input.body.trim().slice(0, 1e3) : "";
+        const item = await getSupportConversationByToken(token);
+        if (!item) return res.status(404).json({ error: "\u5BA2\u670D\u4F1A\u8BDD\u4E0D\u5B58\u5728" });
+        let imageUrl = null;
+        if (input.imageBase64) {
+          const mime = ["image/jpeg", "image/png", "image/webp"].includes(input.imageMime) ? input.imageMime : "image/jpeg";
+          const buffer = Buffer.from(String(input.imageBase64), "base64");
+          if (buffer.byteLength > 1572864) return res.status(400).json({ error: "\u56FE\u7247\u4E0D\u80FD\u8D85\u8FC7 1.5MB" });
+          const ext = mime === "image/png" ? "png" : mime === "image/webp" ? "webp" : "jpg";
+          imageUrl = (await storagePut(`support/${item.id}/${Date.now()}.${ext}`, buffer, mime)).url;
+        }
+        if (!body && !imageUrl) return res.status(400).json({ error: "\u6D88\u606F\u5185\u5BB9\u4E0D\u80FD\u4E3A\u7A7A" });
+        await createSupportMessage({ conversationId: item.id, sender, body: body || null, imageUrl });
+        return res.json({ success: true, imageUrl });
+      }
+      return res.status(404).json({ error: "\u672A\u627E\u5230\u63A5\u53E3" });
+    } catch (error) {
+      console.error("support REST error", error);
+      return res.status(500).json({ error: "\u5BA2\u670D\u670D\u52A1\u6682\u65F6\u4E0D\u53EF\u7528" });
+    }
+  });
   app.get("/api/health", (_req, res) => {
     res.json({ ok: true, timestamp: Date.now() });
   });

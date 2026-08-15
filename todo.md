@@ -103,3 +103,11 @@
 - [ ] 发布 Expo Web 与客服 Functions
 - [ ] 验证正式域名的 /support、文字和图片消息
 - [ ] 可选绑定自定义域名并开启 HTTPS
+
+## Netlify 构建缺失文件修复
+
+- [ ] 补齐 GitHub 仓库中的 scripts/load-env.js
+- [x] 确认 app.config.ts 在 Netlify 构建中可以读取
+- [ ] 重新触发 Netlify 构建并验证正式网页
+- [ ] 将完整项目内容复制到 GitHub Desktop 的 qingliao-support 本地仓库根目录
+- [x] 修复 Netlify 构建找不到 react-native-css-interop/jsx-runtime 的问题
