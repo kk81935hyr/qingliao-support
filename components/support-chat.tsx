@@ -113,9 +113,55 @@ export function SupportChat({ visitorToken, sender, title, subtitle, onBack, onS
 
       {sendError ? <Text className="text-error text-[12px] text-center px-4 pb-1">{sendError}</Text> : null}
       <View className="flex-row items-end border-t border-border bg-background px-4 pt-2 pb-3">
-        <Pressable onPress={sendImage} disabled={isSending} style={({ pressed }) => [{ width: 52, height: 52, borderRadius: 26, alignItems: "center", justifyContent: "center", marginRight: 8 }, pressed && { opacity: 0.55, transform: [{ scale: 0.96 }] }]}><IconSymbol name="photo" size={27} color={colors.muted} /></Pressable>
+        <Pressable
+          onPress={sendImage}
+          disabled={isSending}
+          accessibilityRole="button"
+          accessibilityLabel="选择图片"
+          style={({ pressed }) => [
+            {
+              width: 62,
+              height: 54,
+              borderRadius: 16,
+              alignItems: "center",
+              justifyContent: "center",
+              marginRight: 8,
+              backgroundColor: "#F0EEFF",
+              borderWidth: 1,
+              borderColor: "#CFC9FF",
+            },
+            isSending && { opacity: 0.52 },
+            pressed && !isSending && { opacity: 0.82, transform: [{ scale: 0.96 }] },
+          ]}
+        >
+          <IconSymbol name="photo" size={23} color={colors.primary} />
+          <Text style={{ color: colors.primary, fontSize: 10, fontWeight: "700", marginTop: 1 }}>图片</Text>
+        </Pressable>
         <View className="min-h-13 max-h-28 flex-1 rounded-[20px] px-4 py-2 justify-center bg-surface"><TextInput value={draft} onChangeText={setDraft} placeholder="输入消息..." placeholderTextColor={colors.muted} multiline className="text-[15px] text-foreground" returnKeyType="send" onSubmitEditing={sendText} /></View>
-        <Pressable onPress={sendText} disabled={!canSend} style={({ pressed }) => [{ width: 52, height: 52, borderRadius: 26, marginLeft: 8, backgroundColor: canSend ? colors.primary : colors.surface, alignItems: "center", justifyContent: "center" }, pressed && canSend && { opacity: 0.8, transform: [{ scale: 0.96 }] }]}><IconSymbol name="paperplane.fill" size={23} color={canSend ? "#FFFFFF" : colors.muted} /></Pressable>
+        <Pressable
+          onPress={sendText}
+          disabled={!canSend}
+          accessibilityRole="button"
+          accessibilityLabel="发送消息"
+          style={({ pressed }) => [
+            {
+              width: 74,
+              height: 54,
+              borderRadius: 16,
+              marginLeft: 8,
+              backgroundColor: colors.primary,
+              alignItems: "center",
+              justifyContent: "center",
+            },
+            !canSend && { opacity: 0.48 },
+            pressed && canSend && { opacity: 0.82, transform: [{ scale: 0.96 }] },
+          ]}
+        >
+          <View className="flex-row items-center">
+            <IconSymbol name="paperplane.fill" size={19} color="#FFFFFF" />
+            <Text style={{ color: "#FFFFFF", fontSize: 12, fontWeight: "800", marginLeft: 3 }}>发送</Text>
+          </View>
+        </Pressable>
       </View>
     </KeyboardAvoidingView>
   );
