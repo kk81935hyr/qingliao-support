@@ -1,0 +1,17 @@
+[build]
+  command = "pnpm run build"
+  publish = "web-dist"
+
+[functions]
+  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/api/support"
+  to = "/.netlify/functions/support"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
